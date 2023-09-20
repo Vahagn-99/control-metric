@@ -37,61 +37,61 @@ if (!user || !ip || !projectPath || !sourceFolder || !privateKey) {
 const expandedPrivateKey = privateKey.replace(/^~(?=$|\/|\\)/, os.homedir());
 
 // Check if the IP address is reachable
-const pingCommand = `ping -c 1 ${ip}`;
-const pingChild = exec(pingCommand);
-pingChild.on('error', (error) => {
-    console.error(chalk.red('IP address is unreachable. Please ensure your IP address is correct.'));
-    process.exit(1);
-});
+// const pingCommand = `ping -c 1 ${ip}`;
+// const pingChild = exec(pingCommand);
+// pingChild.on('error', (error) => {
+//     console.error(chalk.red('IP address is unreachable. Please ensure your IP address is correct.'));
+//     process.exit(1);
+// });
 
-pingChild.on('exit', (code) => {
-    if (code !== 0) {
-        console.error(chalk.red('IP address is unreachable. Please ensure your IP address is correct.'));
-        process.exit(1);
+// pingChild.on('exit', (code) => {
+//     if (code !== 0) {
+//         console.error(chalk.red('IP address is unreachable. Please ensure your IP address is correct.'));
+//         process.exit(1);
+//     }
+
+// Test SSH connection using the provided key
+const sshTestCommand = `ssh -i ${expandedPrivateKey} ${user}@${ip} exit`;
+const sshTestChild = exec(sshTestCommand);
+// sshTestChild.on('error', (error) => {
+//     console.error(chalk.red('SSH connection test failed. Please ensure your SSH private key and server details are correct.'));
+//     process.exit(1);
+// });
+
+// sshTestChild.on('exit', (code) => {
+//     if (code !== 0) {
+//         console.error(chalk.red('SSH connection test failed. Please ensure your SSH private key and server details are correct.'));
+//         process.exit(1);
+//     }
+
+//     // Check if the remote path exists
+//     const pathTestCommand = `ssh -i ${expandedPrivateKey} ${user}@${ip} test -d ${projectPath} && echo "Exists" || echo "Does not exist"`;
+//     const pathTestChild = exec(pathTestCommand);
+//     pathTestChild.stdout.on('data', (data) => {
+//         if (data.includes("Does not exist")) {
+//             console.error(chalk.red('Project path does not exist on the remote server. Please ensure your project path is correct.'));
+//             process.exit(1);
+//         }
+
+// If the path exists, run the rsync command
+const sourcePath = path.join(__dirname, sourceFolder);
+const destination = `${user}@${ip}:${projectPath}`;
+const command = `rsync -avz -e "ssh -i ${expandedPrivateKey}" --delete ${sourcePath}/ ${destination}`;
+
+const child = exec(command);
+child.stdout.on('data', (data) => {
+    console.log(chalk.green(data));
+});
+child.stderr.on('data', (data) => {
+    console.error(chalk.red(data));
+});
+child.on('exit', (code) => {
+    if (code === 0) {
+        console.log(chalk.blue('Transfer completed successfully.'));
+    } else {
+        console.log(chalk.red('Transfer failed with exit code ' + code));
     }
-
-    // Test SSH connection using the provided key
-    const sshTestCommand = `ssh -i ${expandedPrivateKey} ${user}@${ip} exit`;
-    const sshTestChild = exec(sshTestCommand);
-    sshTestChild.on('error', (error) => {
-        console.error(chalk.red('SSH connection test failed. Please ensure your SSH private key and server details are correct.'));
-        process.exit(1);
-    });
-
-    sshTestChild.on('exit', (code) => {
-        if (code !== 0) {
-            console.error(chalk.red('SSH connection test failed. Please ensure your SSH private key and server details are correct.'));
-            process.exit(1);
-        }
-
-        // Check if the remote path exists
-        const pathTestCommand = `ssh -i ${expandedPrivateKey} ${user}@${ip} test -d ${projectPath} && echo "Exists" || echo "Does not exist"`;
-        const pathTestChild = exec(pathTestCommand);
-        pathTestChild.stdout.on('data', (data) => {
-            if (data.includes("Does not exist")) {
-                console.error(chalk.red('Project path does not exist on the remote server. Please ensure your project path is correct.'));
-                process.exit(1);
-            }
-
-            // If the path exists, run the rsync command
-            const sourcePath = path.join(__dirname, sourceFolder);
-            const destination = `${user}@${ip}:${projectPath}`;
-            const command = `rsync -avz -e "ssh -i ${expandedPrivateKey}" --delete ${sourcePath}/ ${destination}`;
-
-            const child = exec(command);
-            child.stdout.on('data', (data) => {
-                console.log(chalk.green(data));
-            });
-            child.stderr.on('data', (data) => {
-                console.error(chalk.red(data));
-            });
-            child.on('exit', (code) => {
-                if (code === 0) {
-                    console.log(chalk.blue('Transfer completed successfully.'));
-                } else {
-                    console.log(chalk.red('Transfer failed with exit code ' + code));
-                }
-            });
-        });
-    });
 });
+// });
+//     });
+// });
