@@ -1,5 +1,5 @@
 <template>
-  <router-view></router-view>
+  Not Found
 </template>
 <script setup>
 </script>

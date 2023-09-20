@@ -2,6 +2,8 @@ import axios from 'axios';
 
 
 window.baseUrl = 'https://widgets-api.dicitech.com/api/widgets/';
+window.Host = 'https://widgets-api.dicitech.com/';
+
 // window.baseUrl = 'http://127.0.0.1:8080/api/widgets/';
 const apiClient = axios.create({
     baseURL: window.baseUrl,
