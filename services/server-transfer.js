@@ -17,9 +17,9 @@ const __dirname = path.dirname(__filename);
 
 // Define configuration object with properties from environment variables
 const config = {
-    user: 'amo_widgets',
-    ip: '94.130.15.190',
-    projectPath: 'www/app.control-metrics.ru',
+    user: 'suer',
+    ip: '94.1310.1455.190',
+    projectPath: 'path/to/app',
     sourceFolder: "../dist",
     privateKey: '~/.ssh/dct/id_rsa'
 }
